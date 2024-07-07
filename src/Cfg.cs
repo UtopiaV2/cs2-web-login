@@ -21,7 +21,7 @@ public class Cfg : BasePluginConfig
 	public string infoAbtCredDel { get; set; } = "Use /delcredentials to delete your password!";
 
 	[JsonPropertyName("UsernameMessage")]
-	public string UnMsg { get; set; } = "Username, a.k.a steamid64: ";
+	public string UnMsg { get; set; } = "Username, a.k.a steamid64, you can change this later: ";
 
 	[JsonPropertyName("PasswordDeletionAndUpdateReminder")]
 	public string pwdau { get; set; } = "The password can be removed with /delcredentials. Also you can change the password on the website!"; 

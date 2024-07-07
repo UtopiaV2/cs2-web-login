@@ -78,7 +78,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 		byte[] pw = RandomNumberGenerator.GetBytes(Config.bwBlen);
 		string pwS = Convert.ToBase64String(pw);
 		reader.Close();
-		cmd.CommandText = $"INSERT INTO upm_user VALUE ({player.SteamID}, \"{pwS}\")";
+		cmd.CommandText = $"INSERT INTO upm_user VALUE ({player.SteamID}, \"{pwS}\", {player.SteamID})";
 		cmd.ExecuteNonQuery();
 		player.PrintToCenterAlert(Config.pwAlert);
 		player.PrintToConsole("---------------------------------------------------------------");
