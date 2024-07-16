@@ -5,6 +5,7 @@ using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
+using BC = BCrypt.Net;
 
 namespace cs2_web_login;
 
@@ -78,6 +79,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 		byte[] pw = RandomNumberGenerator.GetBytes(Config.bwBlen);
 		string pwS = Convert.ToBase64String(pw);
 		reader.Close();
+		BC.BCrypt.HashPassword(pwS);
 		cmd.CommandText = $"INSERT INTO upm_user VALUE ({player.SteamID}, \"{pwS}\", {player.SteamID})";
 		cmd.ExecuteNonQuery();
 		player.PrintToCenterAlert(Config.pwAlert);
