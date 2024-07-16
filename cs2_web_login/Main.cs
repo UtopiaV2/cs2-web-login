@@ -13,7 +13,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 {
 	public Database? db;
 	public override string ModuleName => "WebLogin";
-	public override string ModuleVersion => "v1.3.0";
+	public override string ModuleVersion => "v1.4.2";
 	public override string ModuleAuthor => "OwnSample";
 	public override string ModuleDescription => "Creates logins for cry babies! :D";
 	public Cfg Config { get; set; } = new Cfg();
