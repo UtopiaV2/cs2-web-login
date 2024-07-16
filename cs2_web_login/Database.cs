@@ -14,7 +14,6 @@ public class Database
 	{
 		ConnectionStr = dbConnectionString;
 		this.Logger = logger;
-		//base._002Ector();
 	}
 
 	public MySqlConnection GetConnection()
