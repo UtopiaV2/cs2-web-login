@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
@@ -10,6 +11,9 @@ public class Cfg : BasePluginConfig
 
 	[JsonPropertyName("PasswordCharLenght")]
 	public int bwBlen { get; set; } = 16;
+	
+	[JsonPropertyName("BCryprtCost")]
+	public int bc_workfactor { get; set; } = 12;
 
 	[JsonPropertyName("ConsoleAlert")]
 	public string pwAlert { get; set; } = "CHECK YOUR CONSOLE!";

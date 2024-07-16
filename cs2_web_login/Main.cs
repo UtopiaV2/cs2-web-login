@@ -15,7 +15,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 	public override string ModuleName => "WebLogin";
 	public override string ModuleVersion => "v1.3.0";
 	public override string ModuleAuthor => "OwnSample";
-	public override string ModuleDescription => "Creates logins for cry babies!";
+	public override string ModuleDescription => "Creates logins for cry babies! :D";
 	public Cfg Config { get; set; } = new Cfg();
 
 	public override void Load(bool hotReload) 
@@ -64,7 +64,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 		}
 		db = db ?? throw new Exception("Db is null");
 		MySqlCommand cmd = db.GetConnection().CreateCommand();
-		cmd.CommandText = $"SELECT t.steam_id FROM upm_user t WHERE t.steam_id = {player.SteamID}";
 		MySqlDataReader reader = cmd.ExecuteReader();
 		if (reader.Read())
 		{
@@ -76,11 +75,12 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
 			player.PrintToCenterAlert(Config.infoAbtCredDel);
 			return;
 		}
+		reader.Close();
 		byte[] pw = RandomNumberGenerator.GetBytes(Config.bwBlen);
 		string pwS = Convert.ToBase64String(pw);
-		reader.Close();
-		BC.BCrypt.HashPassword(pwS);
 		cmd.CommandText = $"INSERT INTO upm_user VALUE ({player.SteamID}, \"{pwS}\", {player.SteamID})";
+		var hash = BC.BCrypt.HashPassword(pwS, workFactor: Config.bc_workfactor).Replace("$2a$", "$2y$"); // upgrade hash xd
+		cmd.CommandText = $"INSERT INTO {Config.Db.Prefix}{Config.Db.Table} (steam_id, pw, username) VALUE ({player.SteamID}, \"{hash}\", {player.SteamID})";
 		cmd.ExecuteNonQuery();
 		player.PrintToCenterAlert(Config.pwAlert);
 		player.PrintToConsole("---------------------------------------------------------------");
