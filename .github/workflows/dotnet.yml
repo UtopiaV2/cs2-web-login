@@ -8,6 +8,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_NAME: 'cs2-web-login'
+  V_PLACE_HOLDER: {{ github.ref_name }}
 
 permissions:
   packages: write
@@ -25,8 +26,10 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     
-    - name: ls
-      run: ls -la
+    - name: Envsubst
+      run: |
+          envsubst "\$V_PLACE_HOLDER" < cs2-web-login/Main.cs > cs2-web-login/Main.cs.tmp
+          mv cs2-web-login/Main.cs.tmp cs2-web-login/Main.cs
 
     - name: Restore dependencies
       run: dotnet restore 
