@@ -8,7 +8,6 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_NAME: 'cs2-web-login'
-  PUBLISH_DIR: 'publish'
 
 permissions:
   packages: write
@@ -33,16 +32,17 @@ jobs:
       run: dotnet restore 
     
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore -p GIT_TAG=${{ github.ref_name }}
     
     - name: Publish
-      run: dotnet publish --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}
+      run: dotnet publish --configuration Release --no-build --output ${{ env.PROJECT_NAME }}
     
     - name: Compress files
       run: |
-        cd ${{ env.PUBLISH_DIR }}
+        cd ${{ env.PROJECT_NAME }}
         rm -rf Microsoft* runtimes Serilog* Scrutor* System* McMaster*
-        zip -r ../release-${{ github.ref_name }}.zip *
+        cd ..
+        zip -r release-${{ github.ref_name }}.zip ${{ env.PROJECT_NAME }}
     
     - name: Create Release
       uses: marvinpinto/action-automatic-releases@latest
@@ -50,3 +50,4 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         title: Release ${{ github.ref_name }}
         files: release-${{ github.ref_name }}.zip
+        prerelease: false
