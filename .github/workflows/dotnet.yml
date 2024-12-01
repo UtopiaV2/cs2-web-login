@@ -26,13 +26,13 @@ jobs:
       run: ls -la
 
     - name: Restore dependencies
-      run: dotnet restore ${{ env.PROJECT_NAME }}
+      run: dotnet restore 
     
     - name: Build
-      run: dotnet build ${{ env.PROJECT_NAME }} --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore
     
     - name: Publish
-      run: dotnet publish ${{ env.PROJECT_NAME }} --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}
+      run: dotnet publish --configuration Release --no-build --output ${{ env.PUBLISH_DIR }}
     
     - name: Compress files
       run: |
