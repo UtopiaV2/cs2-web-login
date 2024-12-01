@@ -28,7 +28,7 @@ jobs:
     
     - name: Envsubst
       run: |
-          envsubst "\$V_PLACE_HOLDER" < cs2-web-login/Main.cs > cs2-web-login/Main.cs.tmp
+          envsubst "\$V_PLACE_HOLDER" < cs2-web-login/Main.cs > cs2_web_login/Main.cs.tmp
           mv cs2-web-login/Main.cs.tmp cs2-web-login/Main.cs
 
     - name: Restore dependencies
