@@ -28,8 +28,8 @@ jobs:
     
     - name: Envsubst
       run: |
-          envsubst "\$V_PLACE_HOLDER" < cs2-web-login/Main.cs > cs2_web_login/Main.cs.tmp
-          mv cs2-web-login/Main.cs.tmp cs2-web-login/Main.cs
+          envsubst "\$V_PLACE_HOLDER" < cs2_web_login/Main.cs > cs2_web_login/Main.cs.tmp
+          mv cs2_web_login/Main.cs.tmp cs2_web_login/Main.cs
 
     - name: Restore dependencies
       run: dotnet restore 
