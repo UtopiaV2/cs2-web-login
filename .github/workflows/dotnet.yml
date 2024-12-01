@@ -8,7 +8,7 @@ on:
 env:
   DOTNET_VERSION: '8.0.x'
   PROJECT_NAME: 'cs2-web-login'
-  V_PLACE_HOLDER: {{ github.ref_name }}
+  V_PLACE_HOLDER: ${{ github.ref_name }}
 
 permissions:
   packages: write
