@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
@@ -11,7 +10,7 @@ public class Cfg : BasePluginConfig
 
 	[JsonPropertyName("PasswordCharLenght")]
 	public int bwBlen { get; set; } = 16;
-	
+
 	[JsonPropertyName("BCryprtCost")]
 	public int bc_workfactor { get; set; } = 12;
 
@@ -28,7 +27,10 @@ public class Cfg : BasePluginConfig
 	public string UnMsg { get; set; } = "Username, a.k.a steamid64, you can change this later: ";
 
 	[JsonPropertyName("PasswordDeletionAndUpdateReminder")]
-	public string pwdau { get; set; } = "The password can be removed with /delcredentials. Also you can change the password on the website!"; 
+	public string pwdau { get; set; } = "The password can be removed with /delcredentials. Also you can change the password on the website!";
 
+	[JsonPropertyName("SuccessfulDeleteion")]
+	public string succDel { get; set; } = "The credentials has been deleted!";
 }
 // "Jelszó, a /delcredentials ki lehet törölni, ill. a weboldalon betudod állítani a saját jelszavadat"
+/*Vim: set expandtab tabstop=4 shiftwidth=4:*/
