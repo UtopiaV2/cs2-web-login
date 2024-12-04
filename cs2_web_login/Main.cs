@@ -47,7 +47,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
         Config = config;
     }
 
-    [ConsoleCommand("css_login_auto_update", "Auto update")]
+    [ConsoleCommand("css_login_update", "Auto update")]
     public void AutoUpdateCommand(CCSPlayerController? player, CommandInfo info)
     {
         if (player != null)
