@@ -16,14 +16,62 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     public override string ModuleAuthor => "OwnSample";
     public override string ModuleDescription => "Creates logins for cry babies! :D";
     public Cfg Config { get; set; } = new Cfg();
+    AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
 
     public override void Load(bool hotReload)
     {
         db = new Database($"Server={Config.Db.Host};User ID={Config.Db.User};Password={Config.Db.Password};Database={Config.Db.Database}", base.Logger);
+        AU = new AutoUpdater(ModuleVersion, base.Logger, base.ModuleDirectory, Config.AutoUpdate);
+        if (AU.IsUpdateAvailable() && Config.AutoUpdate)
+        {
+            base.Logger.LogWarning("Update available");
+            base.Logger.LogWarning(AU.ToString());
+            if (AU.DownloadUpdate())
+            {
+                base.Logger.LogInformation("Downloaded update");
+                if (AU.UnpackUpdate())
+                {
+                    base.Logger.LogInformation("Unpacked update");
+                    base.Logger.LogInformation("Restarting server");
+                }
+            }
+        }
+        else
+        {
+            base.Logger.LogInformation("No updates available");
+        }
     }
+
     public void OnConfigParsed(Cfg config)
     {
         Config = config;
+    }
+
+    [ConsoleCommand("css_login_auto_update", "Auto update")]
+    public void AutoUpdateCommand(CCSPlayerController? player, CommandInfo info)
+    {
+        if (player != null)
+        {
+            return;
+        }
+        if (AU.IsUpdateAvailable())
+        {
+            base.Logger.LogWarning("Update available");
+            base.Logger.LogWarning(AU.ToString());
+            if (AU.DownloadUpdate())
+            {
+                base.Logger.LogInformation("Downloaded update");
+                if (AU.UnpackUpdate())
+                {
+                    base.Logger.LogInformation("Unpacked update");
+                    base.Logger.LogInformation("Restarting server");
+                }
+            }
+        }
+        else
+        {
+            base.Logger.LogInformation("No updates available");
+        }
     }
 
     [ConsoleCommand("css_delcredentials", "Del login cred")]
