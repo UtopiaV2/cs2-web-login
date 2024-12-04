@@ -93,6 +93,7 @@ class AutoUpdater
 
   public bool IsUpdateAvailable()
   {
+    latestRelease = GetLatestRelease().Result;
     return latestRelease.TagName != local_version;
   }
 
