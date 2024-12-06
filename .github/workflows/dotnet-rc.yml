@@ -1,9 +1,9 @@
-name: Build and Publish .NET Project
+name: Build and Publish .NET Project rc version
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*-rc'
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -35,8 +35,8 @@ jobs:
       run: dotnet restore 
     
     - name: Build
-      run: dotnet build --configuration Release --no-restore -p GIT_TAG=${{ github.ref_name }}
-    
+      run: dotnet build --configuration Release --no-restore 
+
     - name: Publish
       run: dotnet publish --configuration Release --no-build --output ${{ env.PROJECT_NAME }}
     
@@ -53,4 +53,4 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         title: Release ${{ github.ref_name }}
         files: release-${{ github.ref_name }}.zip
-        prerelease: false
+        prerelease: true
