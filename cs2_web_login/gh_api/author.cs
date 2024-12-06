@@ -23,4 +23,5 @@ public record Author(
   [property: JsonPropertyName("user_view_type")] string UserViewType,
   [property: JsonPropertyName("site_admin")] bool SiteAdmin
 );
+
 /*Vim: set expandtab tabstop=2 shiftwidth=2:*/
