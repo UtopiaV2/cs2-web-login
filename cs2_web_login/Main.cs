@@ -88,7 +88,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.RecordsAffected == 0)
         {
-            player.PrintToCenterAlert(Config.noLogCredForDel);
+            player.PrintToCenterAlert(Config.NoLogCredForDel);
             return;
         }
         while (reader.Read())
@@ -102,7 +102,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
         reader.Close();
         cmd.CommandText = $"DELETE FROM {Config.Db.Prefix}{Config.Db.Table} WHERE steam_id = {player.SteamID}";
         cmd.ExecuteReader();
-        player.PrintToCenterAlert(Config.succDel);
+        player.PrintToCenterAlert(Config.SuccDel);
     }
 
     [ConsoleCommand("css_credentials", "Gen login cred")]
@@ -124,20 +124,20 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
             {
                 throw new Exception("How tf was player.steamId and what we got back is not the same");
             }
-            player.PrintToCenterAlert(Config.infoAbtCredDel);
+            player.PrintToCenterAlert(Config.InfoAbtCredDel);
             return;
         }
         reader.Close();
-        byte[] pw = RandomNumberGenerator.GetBytes(Config.bwBlen);
+        byte[] pw = RandomNumberGenerator.GetBytes(Config.BwBlen);
         string pwS = Convert.ToBase64String(pw);
-        var hash = BC.BCrypt.HashPassword(pwS, workFactor: Config.bc_workfactor).Replace("$2a$", "$2y$"); // upgrade hash xd
+        var hash = BC.BCrypt.HashPassword(pwS, workFactor: Config.Bc_workfactor).Replace("$2a$", "$2y$"); // upgrade hash xd
         cmd.CommandText = $"INSERT INTO {Config.Db.Prefix}{Config.Db.Table} (steam_id, pw, username) VALUE ({player.SteamID}, \"{hash}\", {player.SteamID})";
         cmd.ExecuteNonQuery();
-        player.PrintToCenterAlert(Config.pwAlert);
+        player.PrintToCenterAlert(Config.PwAlert);
         player.PrintToConsole("---------------------------------------------------------------");
         player.PrintToConsole(Config.UnMsg);
         player.PrintToConsole(player.SteamID.ToString());
-        player.PrintToConsole(Config.pwdau);
+        player.PrintToConsole(Config.Pwdau);
         player.PrintToConsole(pwS);
         player.PrintToConsole("---------------------------------------------------------------");
     }
