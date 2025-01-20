@@ -8,14 +8,15 @@ class AutoUpdater
 {
   ILogger logger;
   public Release latestRelease;
-  private readonly string local_version;
-  string module_path;
+  string local_version, module_path;
+  bool rc_release;
 
-  public AutoUpdater(string local_version, ILogger logger, string module_path, bool autoCheck = true)
+  public AutoUpdater(string local_version, ILogger logger, string module_path, bool autoCheck = true, bool use_rc_release = false)
   {
     this.logger = logger;
     this.local_version = local_version;
     this.module_path = module_path;
+    this.rc_release = use_rc_release;
     logger.LogInformation("Checking for updates");
     if (autoCheck)
       latestRelease = GetLatestRelease().Result;
@@ -42,7 +43,7 @@ class AutoUpdater
     }
   }
 
-  public bool DownloadUpdate()
+  public async Task<bool> DownloadUpdate()
   {
     if (latestRelease == null)
     {
@@ -59,8 +60,8 @@ class AutoUpdater
       {
         using (var fileStream = File.Create(download_path))
         {
-          res.Result.CopyTo(fileStream);
-          fileStream.Flush();
+          await res.Result.CopyToAsync(fileStream);
+          await fileStream.FlushAsync();
           fileStream.Close();
         }
       }
@@ -94,7 +95,10 @@ class AutoUpdater
   public bool IsUpdateAvailable()
   {
     latestRelease = GetLatestRelease().Result;
-    return latestRelease.TagName != local_version;
+    if (rc_release)
+      return latestRelease.TagName != local_version;
+    else
+      return !latestRelease.TagName.EndsWith("-rc") && latestRelease.TagName != local_version;
   }
 
   public override string ToString()
