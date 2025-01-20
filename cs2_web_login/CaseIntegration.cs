@@ -39,7 +39,8 @@ class CaseIntegration
       Logger.LogError("Failed to get Player-Services API for K4-Cases.");
       return;
     }
-    PlayerServices.RefreshWeapon((int)WeaponDefIndex.Ak47);
+    Logger.LogInformation("Player-Services API for K4-Cases is available.");
+    PlayerServices.RefreshWeapon((int)WeaponDefIndex.Ak47, true);
 
   }
 }
