@@ -47,7 +47,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     Config = config;
   }
 
-  [ConsoleCommand("css_case", "Case integration")]
+  [ConsoleCommand("css_case_int", "Case integration")]
   public void CaseCommand(CCSPlayerController? player, CommandInfo info)
   {
     if (player == null)
