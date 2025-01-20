@@ -1,9 +1,6 @@
 using CasesAPI;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Core.Capabilities;
-using CounterStrikeSharp.API.Modules.Commands;
 using Microsoft.Extensions.Logging;
 
 namespace cs2_web_login;
@@ -41,6 +38,8 @@ class CaseIntegration
     }
     Logger.LogInformation("Player-Services API for K4-Cases is available.");
     PlayerServices.RefreshWeapon((int)WeaponDefIndex.Ak47, true);
+    PlayerServices.Credits += 1000;
+
 
   }
 }
