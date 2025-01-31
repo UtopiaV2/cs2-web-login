@@ -40,22 +40,12 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
+    CaseIntegration CI = new(base.Logger, Config.Http);
   }
 
   public void OnConfigParsed(Cfg config)
   {
     Config = config;
-  }
-
-  [ConsoleCommand("css_case_int", "Case integration")]
-  public void CaseCommand(CCSPlayerController? player, CommandInfo info)
-  {
-    if (player == null)
-    {
-      return;
-    }
-    CaseIntegration CI = new(base.Logger);
-    CI.Player(player);
   }
 
   [ConsoleCommand("css_login_update", "Auto update")]
