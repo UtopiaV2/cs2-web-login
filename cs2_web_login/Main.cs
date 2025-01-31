@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
-using Microsoft.Extensions.Logging;
 using MySqlConnector;
 using BC = BCrypt.Net;
 
@@ -142,5 +141,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     player.PrintToConsole(pwS);
     player.PrintToConsole("---------------------------------------------------------------");
   }
+  static void Main() { }
 }
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/

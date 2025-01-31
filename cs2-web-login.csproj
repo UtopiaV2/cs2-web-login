@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.NET-Next" Version="4.0.3" />
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.246" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.3.0" />
+    <!--<PackageReference Include="Microsoft.AspNetCore" Version="2.3.0" />-->
     <PackageReference Include="MySQLConnector" Version="2.3.7" />
   </ItemGroup>
   <ItemGroup>
