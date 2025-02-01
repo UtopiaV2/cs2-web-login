@@ -23,9 +23,9 @@ class CaseIntegration
     var builder = WebApplication.CreateBuilder();
     var app = builder.Build();
 
-    app.MapPost("/credit", (HttpRequest request) =>
+    app.MapPost("/credit", async (HttpRequest request) =>
     {
-      var payload = JsonSerializer.Deserialize<Payload>(request.Body);
+      var payload = await JsonSerializer.DeserializeAsync<Payload>(request.Body);
       if (payload is null)
       {
         Logger.LogError("Failed to parse payload");
@@ -45,6 +45,7 @@ class CaseIntegration
         return;
       }
       PlayerServices.Credits += payload.Target;
+      return;
     });
     this.Token = app.RunAsync($"http://{this.HttpCfg.Host}:{this.HttpCfg.Port}");
   }
