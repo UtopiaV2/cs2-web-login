@@ -40,7 +40,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    CI = new(base.Logger, Config.Http);
+    CI = new(base.Logger, Config.Http, base.ModuleDirectory);
     var hosts = Host.CreateDefaultBuilder().ConfigureServices(services =>
     {
       services.AddSingleton<CaseIntegration>();

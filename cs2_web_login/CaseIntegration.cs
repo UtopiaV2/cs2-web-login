@@ -16,11 +16,13 @@ class CaseIntegration : IHostedService
   readonly HttpCfg HttpCfg;
   readonly ILogger Logger;
   private PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
+  private string path;
 
-  public CaseIntegration(ILogger logger, HttpCfg httpCfg)
+  public CaseIntegration(ILogger logger, HttpCfg httpCfg, string path)
   {
     this.Logger = logger;
     this.HttpCfg = httpCfg;
+    this.path = path;
     _webHost = null!;
   }
 
@@ -28,13 +30,14 @@ class CaseIntegration : IHostedService
   {
     if (_isRunning)
       return;
+
     _webHost = new WebHostBuilder().UseKestrel(options =>
     {
       options.Listen(IPAddress.Parse(HttpCfg.Host), HttpCfg.Port);
-      // options.ListenLocalhost(HttpCfg.Port);
-    }).ConfigureServices(services =>
+    })
+    .UseContentRoot(path)
+    .ConfigureServices(services =>
     {
-      // Add your services here
       services.AddControllers();
     }).Configure(app =>
     {
