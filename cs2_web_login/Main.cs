@@ -153,6 +153,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     player.PrintToConsole(pwS);
     player.PrintToConsole("---------------------------------------------------------------");
   }
-  /*static void Main() { }*/
+  static void Main() { }
 }
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/
