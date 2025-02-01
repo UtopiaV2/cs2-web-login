@@ -54,9 +54,9 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       db = db ?? throw new Exception("Db is null");
       db.GetConnection().Close();
-      CI = CI ?? throw new Exception("CI is null");
-      CI.Token.Dispose();
     }
+    CI = CI ?? throw new Exception("CI is null");
+    CI.Token.Dispose();
   }
 
   [ConsoleCommand("css_login_update", "Auto update")]
