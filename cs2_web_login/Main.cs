@@ -16,7 +16,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   public override string ModuleDescription => "Creates logins for cry babies! :D";
   public Cfg Config { get; set; } = new Cfg();
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
-  CaseIntegration CI = null!; // CaseIntegration is not null, but it's not initialized
+  private CaseIntegration CI = null!; // CaseIntegration is not null, but it's not initialized
 
   public override void Load(bool hotReload)
   {
@@ -41,6 +41,11 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       base.Logger.LogInformation("No updates available");
     }
     CI = new(base.Logger, Config.Http);
+    var hosts = Host.CreateDefaultBuilder().ConfigureServices(services =>
+    {
+      services.AddSingleton<CaseIntegration>();
+      services.AddHostedService(_ => CI);
+    }).Build().RunAsync();
   }
 
   public void OnConfigParsed(Cfg config)
@@ -55,8 +60,10 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       db = db ?? throw new Exception("Db is null");
       db.GetConnection().Close();
     }
-    CI = CI ?? throw new Exception("CI is null");
-    CI.Token.Dispose();
+    if (CI.IsRunning)
+    {
+      CI.StopAsync(CancellationToken.None).Wait();
+    }
   }
 
   [ConsoleCommand("css_login_update", "Auto update")]
