@@ -16,6 +16,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   public override string ModuleDescription => "Creates logins for cry babies! :D";
   public Cfg Config { get; set; } = new Cfg();
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
+  CaseIntegration CI = null!; // CaseIntegration is not null, but it's not initialized
 
   public override void Load(bool hotReload)
   {
@@ -39,12 +40,23 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    CaseIntegration CI = new(base.Logger, Config.Http);
+    CI = new(base.Logger, Config.Http);
   }
 
   public void OnConfigParsed(Cfg config)
   {
     Config = config;
+  }
+
+  public override void Unload(bool hotReload)
+  {
+    if (!hotReload)
+    {
+      db = db ?? throw new Exception("Db is null");
+      db.GetConnection().Close();
+      CI = CI ?? throw new Exception("CI is null");
+      CI.Token.Dispose();
+    }
   }
 
   [ConsoleCommand("css_login_update", "Auto update")]
@@ -141,6 +153,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     player.PrintToConsole(pwS);
     player.PrintToConsole("---------------------------------------------------------------");
   }
-  static void Main() { }
+  /*static void Main() { }*/
 }
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/

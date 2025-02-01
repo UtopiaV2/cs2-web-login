@@ -3,23 +3,16 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Capabilities;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace cs2_web_login;
 
 class CaseIntegration
 {
   public static PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
-
   public static PluginCapability<IModuleServices> Capability_ModuleServices { get; } = new("k4-cases:module-services");
   public static PluginCapability<IDatabaseServices> Capability_DatabaseServices { get; } = new("k4-cases:database-services");
   public static PluginCapability<IConfigServices> Capability_ConfigServices { get; } = new("k4-cases:config-services");
-
+  public Task Token { get; set; }
   ILogger Logger;
   HttpCfg HttpCfg;
   public CaseIntegration(ILogger logger, HttpCfg httpCfg)
@@ -53,7 +46,7 @@ class CaseIntegration
       }
       PlayerServices.Credits += payload.Target;
     });
-    app.RunAsync();
+    this.Token = app.RunAsync($"http://{this.HttpCfg.Host}:{this.HttpCfg.Port}");
   }
 
   public void Player(CCSPlayerController player)
