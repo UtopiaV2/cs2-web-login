@@ -8,5 +8,5 @@ public class Payload
   public ulong SteamID;
 
   [JsonPropertyName("bal")]
-  public long Target;
+  public double Target;
 }

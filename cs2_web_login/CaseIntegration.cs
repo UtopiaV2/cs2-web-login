@@ -1,116 +1,71 @@
-using CasesAPI;
-using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Capabilities;
-using System.Net;
-using System.Text.Json;
+using PusherClient;
 
 namespace cs2_web_login;
 
-class CaseIntegration : IHostedService
+class CI2
 {
-  private bool _isRunning;
-  public bool IsRunning => _isRunning;
-  private IWebHost _webHost;
+  private Pusher PC;
 
-  readonly HttpCfg HttpCfg;
-  readonly ILogger Logger;
-  private PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
-  private string path;
+  private Channel Channel;
 
-  public CaseIntegration(ILogger logger, HttpCfg httpCfg, string path)
+  private readonly ILogger Logger;
+
+  private readonly PusherCfg Cfg;
+
+  public CI2(PusherCfg cfg, ILogger logger)
   {
-    this.Logger = logger;
-    this.HttpCfg = httpCfg;
-    this.path = path;
-    _webHost = null!;
+    Logger = logger;
+    Cfg = cfg;
+    Init();
   }
-
-  public async Task StartAsync(CancellationToken cancellationToken)
+  public async void Init()
   {
-    if (_isRunning)
-      return;
+    PC = new Pusher(Cfg.Key, new PusherOptions
+    {
+      Cluster = "eu",
+      Encrypted = true
+    });
+    PC.Error += OnError;
+    PC.ConnectionStateChanged += OnConnectionStateChanged;
+    PC.Connected += (sender) => Logger.LogInformation("Connected");
+    PC.Subscribed += OnSubscribed;
+    PC.BindAll(GeneralLog);
+    await PC.ConnectAsync().ConfigureAwait(false);
 
-    _webHost = new WebHostBuilder().UseKestrel(options =>
+    try
     {
-      options.Listen(IPAddress.Parse(HttpCfg.Host), HttpCfg.Port);
-    })
-    .UseContentRoot(path)
-    .ConfigureServices(services =>
+      Channel = await PC.SubscribeAsync("nebula-panel-test");
+      Channel.BindAll(OnMessage);
+    }
+    catch (ChannelUnauthorizedException e)
     {
-      services.AddControllers();
-    }).Configure(app =>
-    {
-      app.UseRouting();
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
-        // Example endpoint
-        endpoints.MapGet("/", async context =>
-        {
-          await context.Response.WriteAsync("Embedded Kestrel Service is running!");
-        });
-        endpoints.MapPost("/credit", async (HttpRequest request) =>
-        {
-          var payload = await JsonSerializer.DeserializeAsync<Payload>(request.Body);
-          if (payload is null)
-          {
-            Logger.LogError("Failed to parse payload");
-            await JsonSerializer.SerializeAsync(request.Body, new { Success = false });
-            return;
-          }
-          CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
-          if (player is null)
-          {
-            Logger.LogError("Failed to get player");
-            await JsonSerializer.SerializeAsync(request.Body, new { Success = false });
-            return;
-          }
-          IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-          if (PlayerServices is null)
-          {
-            Logger.LogError("Failed to get Player-Services API for K4-Cases.");
-            await JsonSerializer.SerializeAsync(request.Body, new { Success = false });
-            return;
-          }
-          PlayerServices.Credits += payload.Target;
-          Logger.LogInformation($"Added {payload.Target} credits to {player.PlayerName}");
-          await JsonSerializer.SerializeAsync(request.Body, new { Success = true });
-        });
-      });
-    }).Build();
-    await _webHost.StartAsync(cancellationToken);
-    _isRunning = true;
-  }
-
-  public async Task StopAsync(CancellationToken cancellationToken)
-  {
-    if (_webHost != null && _isRunning)
-    {
-      await _webHost.StopAsync(cancellationToken);
-      _webHost.Dispose();
-      _webHost = null!;
-      _isRunning = false;
+      Logger.LogError($"Authorization failed for {e.ChannelName}. {e.Message}");
     }
   }
 
-  public async Task RestartAsync(CancellationToken cancellationToken = default)
+  private void OnMessage(object sender, PusherEvent data)
   {
-    await StopAsync(cancellationToken);
-    await StartAsync(cancellationToken);
+    Logger.LogInformation("Message: " + data.Data);
   }
 
-  public void Player(CCSPlayerController player)
+  private void GeneralLog(string eventName, PusherEvent data)
   {
-    IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+    Logger.LogInformation("Event: " + eventName + " Data: " + data.Data);
+  }
 
-    if (PlayerServices is null)
-    {
-      Logger.LogError("Failed to get Player-Services API for K4-Cases.");
-      return;
-    }
-    Logger.LogInformation("Player-Services API for K4-Cases is available.");
-    PlayerServices.RefreshWeapon((int)WeaponDefIndex.Ak47, true);
-    PlayerServices.Credits += 1000;
+
+  private void OnError(object sender, PusherException error)
+  {
+    Logger.LogError("Error: " + error.Message);
+  }
+
+  private void OnConnectionStateChanged(object sender, ConnectionState state)
+  {
+    Logger.LogInformation("Connection state: " + state.ToString());
+  }
+
+  private void OnSubscribed(object sender, Channel channelName)
+  {
+    Logger.LogInformation("Subscribed to channel: " + channelName.Name);
   }
 }
