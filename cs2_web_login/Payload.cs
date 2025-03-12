@@ -4,9 +4,9 @@ namespace cs2_web_login;
 
 public class Payload
 {
-  [JsonPropertyName("steamid")]
+  [JsonPropertyName("steam_id")]
   public ulong SteamID;
 
-  [JsonPropertyName("bal")]
-  public double Target;
+  [JsonPropertyName("new_balance")]
+  public decimal Bal;
 }
