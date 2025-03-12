@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using MySqlConnector;
+using PusherClient;
 using BC = BCrypt.Net;
 
 namespace cs2_web_login;
@@ -16,7 +17,9 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   public override string ModuleDescription => "Creates logins for cry babies! :D";
   public Cfg Config { get; set; } = new Cfg();
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
-  private CaseIntegration CI = null!; // CaseIntegration is not null, but it's not initialized
+  private CI2 CI = null!; // CaseIntegration is not null, but it's not initialized
+
+  private Thread WSCThread = null!;
 
   public override void Load(bool hotReload)
   {
@@ -40,12 +43,8 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    CI = new(base.Logger, Config.Http, base.ModuleDirectory);
-    var hosts = Host.CreateDefaultBuilder().ConfigureServices(services =>
-    {
-      services.AddSingleton<CaseIntegration>();
-      services.AddHostedService(_ => CI);
-    }).Build().RunAsync();
+
+
   }
 
   public void OnConfigParsed(Cfg config)
@@ -60,9 +59,9 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       db = db ?? throw new Exception("Db is null");
       db.GetConnection().Close();
     }
-    if (CI.IsRunning)
+    if (WSCThread.IsAlive)
     {
-      CI.StopAsync(CancellationToken.None).Wait();
+      WSCThread.Join();
     }
   }
 

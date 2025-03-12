@@ -8,8 +8,8 @@ public class Cfg : BasePluginConfig
   [JsonPropertyName("Database")]
   public DB Db { get; set; } = new DB();
 
-  [JsonPropertyName("Http")]
-  public HttpCfg Http { get; set; } = new HttpCfg();
+  [JsonPropertyName("pusher")]
+  public PusherCfg PusherCfg { get; set; } = new PusherCfg();
 
   [JsonPropertyName("AutoUpdate")]
   public bool AutoUpdate { get; set; } = true;
