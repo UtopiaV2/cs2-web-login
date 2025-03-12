@@ -4,6 +4,6 @@ namespace cs2_web_login;
 
 public class PusherCfg
 {
-  [JsonPropertyName("key")]
+  [JsonPropertyName("Key")]
   public string Key { get; set; } = "";
 };
