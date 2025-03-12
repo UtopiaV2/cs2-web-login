@@ -3,7 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using MySqlConnector;
-using PusherClient;
+using Microsoft.Extensions.Logging;
 using BC = BCrypt.Net;
 
 namespace cs2_web_login;

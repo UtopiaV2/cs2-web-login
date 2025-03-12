@@ -1,4 +1,5 @@
 using PusherClient;
+using Microsoft.Extensions.Logging;
 
 namespace cs2_web_login;
 
