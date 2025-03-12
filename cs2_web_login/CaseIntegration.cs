@@ -19,6 +19,11 @@ class CI2
     Payloads = payloads;
     Init();
   }
+
+  ~CI2()
+  {
+    PC.DisconnectAsync().Wait();
+  }
   public async void Init()
   {
     PC = new Pusher(Cfg.Key, new PusherOptions
@@ -54,6 +59,7 @@ class CI2
     }
     Logger.LogInformation("SteamID: " + payload.SteamID);
     Logger.LogInformation("Balance: " + payload.Bal);
+    Logger.LogInformation("Adding payload to list");
     Payloads.Add(payload);
   }
 

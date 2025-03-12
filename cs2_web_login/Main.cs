@@ -56,6 +56,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       {
         return;
       }
+      Logger.LogInformation("Payloads count: " + Payloads.Count);
       Payload payload = Payloads[0];
       CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
       if (player == null)
@@ -71,7 +72,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       }
       PlayerServices.Credits = payload.Bal;
       Payloads.RemoveAt(0);
-    });
+    }, TimerFlags.REPEAT);
   }
 
   public void OnConfigParsed(Cfg config)
