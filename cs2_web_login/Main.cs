@@ -19,7 +19,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
   private CI2 CI = null!; // CaseIntegration is not null, but it's not initialized
 
-  private Thread WSCThread = null!;
 
   public override void Load(bool hotReload)
   {
@@ -43,8 +42,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-
-
+    CI = new CI2(Config.PusherCfg, base.Logger);
   }
 
   public void OnConfigParsed(Cfg config)
@@ -58,10 +56,6 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       db = db ?? throw new Exception("Db is null");
       db.GetConnection().Close();
-    }
-    if (WSCThread.IsAlive)
-    {
-      WSCThread.Join();
     }
   }
 
