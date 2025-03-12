@@ -6,8 +6,8 @@ namespace cs2_web_login;
 
 class CI2
 {
-  private Pusher PC;
-  private Channel Channel;
+  private Pusher PC = null!;
+  private Channel Channel = null!;
   private readonly ILogger Logger;
   private readonly PusherCfg Cfg;
   private List<Payload> Payloads;

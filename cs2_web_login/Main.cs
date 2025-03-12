@@ -54,24 +54,42 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       if (Payloads.Count == 0)
       {
+        Logger.LogInformation("Payloads count is 0");
         return;
       }
       Logger.LogInformation("Payloads count: " + Payloads.Count);
-      Payload payload = Payloads[0];
-      CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
-      if (player == null)
+      Payloads.ForEach((payload) =>
       {
-        Logger.LogError("Player is null");
-        return;
-      }
-      IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-      if (PlayerServices == null)
-      {
-        Logger.LogError("PlayerServices is null");
-        return;
-      }
-      PlayerServices.Credits = payload.Bal;
-      Payloads.RemoveAt(0);
+        CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
+        if (player == null)
+        {
+          Logger.LogError("Player is null");
+          return;
+        }
+        IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+        if (PlayerServices == null)
+        {
+          Logger.LogError("PlayerServices is null");
+          return;
+        }
+        PlayerServices.Credits = payload.Bal;
+        Payloads.Remove(payload);
+      });
+      // Payload payload = Payloads[0];
+      // CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
+      // if (player == null)
+      // {
+      //   Logger.LogError("Player is null");
+      //   return;
+      // }
+      // IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+      // if (PlayerServices == null)
+      // {
+      //   Logger.LogError("PlayerServices is null");
+      //   return;
+      // }
+      // PlayerServices.Credits = payload.Bal;
+      // Payloads.RemoveAt(0);
     }, TimerFlags.REPEAT);
   }
 
