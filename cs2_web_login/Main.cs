@@ -1,9 +1,12 @@
 using System.Security.Cryptography;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using MySqlConnector;
 using Microsoft.Extensions.Logging;
+using CounterStrikeSharp.API.Core.Capabilities;
+using CasesAPI;
 using BC = BCrypt.Net;
 
 namespace cs2_web_login;
@@ -19,6 +22,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
   private CI2 CI = null!; // CaseIntegration is not null, but it's not initialized
 
+  public static PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
 
   public override void Load(bool hotReload)
   {
@@ -43,6 +47,23 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       base.Logger.LogInformation("No updates available");
     }
     CI = new CI2(Config.PusherCfg, base.Logger);
+  }
+
+  public static void UpdateBal(Payload payload, ILogger Logger)
+  {
+    CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
+    if (player == null)
+    {
+      Logger.LogError("Player is null");
+      return;
+    }
+    IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+    if (PlayerServices == null)
+    {
+      Logger.LogError("PlayerServices is null");
+      return;
+    }
+    PlayerServices.Credits = payload.Bal;
   }
 
   public void OnConfigParsed(Cfg config)

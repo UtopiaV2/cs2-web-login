@@ -1,10 +1,6 @@
-using CasesAPI;
 using PusherClient;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Capabilities;
 
 namespace cs2_web_login;
 
@@ -18,7 +14,6 @@ class CI2
 
   private readonly PusherCfg Cfg;
 
-  private PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
 
   public CI2(PusherCfg cfg, ILogger logger)
   {
@@ -62,20 +57,7 @@ class CI2
     }
     Logger.LogInformation("SteamID: " + payload.SteamID);
     Logger.LogInformation("Balance: " + payload.Bal);
-
-    CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
-    if (player == null)
-    {
-      Logger.LogError("Player is null");
-      return;
-    }
-    IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-    if (PlayerServices == null)
-    {
-      Logger.LogError("PlayerServices is null");
-      return;
-    }
-    PlayerServices.Credits = payload.Bal;
+    Class1.UpdateBal(payload, Logger);
   }
 
   private void GeneralLog(string eventName, PusherEvent data)
