@@ -7,18 +7,16 @@ namespace cs2_web_login;
 class CI2
 {
   private Pusher PC;
-
   private Channel Channel;
-
   private readonly ILogger Logger;
-
   private readonly PusherCfg Cfg;
+  private List<Payload> Payloads;
 
-
-  public CI2(PusherCfg cfg, ILogger logger)
+  public CI2(PusherCfg cfg, ILogger logger, ref List<Payload> payloads)
   {
     Logger = logger;
     Cfg = cfg;
+    Payloads = payloads;
     Init();
   }
   public async void Init()
@@ -32,7 +30,6 @@ class CI2
     PC.ConnectionStateChanged += OnConnectionStateChanged;
     PC.Connected += (sender) => Logger.LogInformation("Connected");
     PC.Subscribed += OnSubscribed;
-    PC.BindAll(GeneralLog);
     await PC.ConnectAsync().ConfigureAwait(false);
 
     try
@@ -57,14 +54,8 @@ class CI2
     }
     Logger.LogInformation("SteamID: " + payload.SteamID);
     Logger.LogInformation("Balance: " + payload.Bal);
-    Class1.UpdateBal(payload, Logger);
+    Payloads.Add(payload);
   }
-
-  private void GeneralLog(string eventName, PusherEvent data)
-  {
-    Logger.LogInformation("Event: " + eventName + " Data: " + data.Data);
-  }
-
 
   private void OnError(object sender, PusherException error)
   {

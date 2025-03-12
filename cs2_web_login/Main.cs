@@ -3,6 +3,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Timers;
 using MySqlConnector;
 using Microsoft.Extensions.Logging;
 using CounterStrikeSharp.API.Core.Capabilities;
@@ -21,8 +22,10 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   public Cfg Config { get; set; } = new Cfg();
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
   private CI2 CI = null!; // CaseIntegration is not null, but it's not initialized
+  private PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
+  private List<Payload> Payloads = new();
 
-  public static PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
+  private CounterStrikeSharp.API.Modules.Timers.Timer T = null!;
 
   public override void Load(bool hotReload)
   {
@@ -46,24 +49,29 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    CI = new CI2(Config.PusherCfg, base.Logger);
-  }
-
-  public static void UpdateBal(Payload payload, ILogger Logger)
-  {
-    CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
-    if (player == null)
+    CI = new CI2(Config.PusherCfg, base.Logger, ref Payloads);
+    T = new(Config.PusherCfg.Interval, () =>
     {
-      Logger.LogError("Player is null");
-      return;
-    }
-    IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-    if (PlayerServices == null)
-    {
-      Logger.LogError("PlayerServices is null");
-      return;
-    }
-    PlayerServices.Credits = payload.Bal;
+      if (Payloads.Count == 0)
+      {
+        return;
+      }
+      Payload payload = Payloads[0];
+      CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
+      if (player == null)
+      {
+        Logger.LogError("Player is null");
+        return;
+      }
+      IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+      if (PlayerServices == null)
+      {
+        Logger.LogError("PlayerServices is null");
+        return;
+      }
+      PlayerServices.Credits = payload.Bal;
+      Payloads.RemoveAt(0);
+    });
   }
 
   public void OnConfigParsed(Cfg config)
@@ -78,6 +86,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       db = db ?? throw new Exception("Db is null");
       db.GetConnection().Close();
     }
+    T.Kill();
   }
 
   [ConsoleCommand("css_login_update", "Auto update")]
