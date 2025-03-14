@@ -10,7 +10,7 @@ public class Cfg : BasePluginConfig
   public DB Db { get; set; } = new DB();
 
   [JsonPropertyName("Interval")]
-  public float Interval { get; set; } = 0.5f;
+  public float Interval { get; set; } = 30f;
 
   [JsonPropertyName("AutoUpdate")]
   public bool AutoUpdate { get; set; } = true;

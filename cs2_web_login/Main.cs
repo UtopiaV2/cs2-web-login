@@ -50,9 +50,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     T = new(Config.Interval, () =>
     {
       if (db == null)
-      {
         throw new Exception("Db is null");
-      }
       MySqlCommand cmd = db.GetConnection().CreateCommand();
       cmd.CommandText = $"LOCK TABLE {Config.Db.TransactionTable} WRITE";
       cmd.ExecuteNonQuery();
