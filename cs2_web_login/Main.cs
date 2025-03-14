@@ -77,7 +77,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
           continue;
         }
         PlayerServices.Credits += Bal;
-        player.PrintToCenterAlert(string.Format(Config.SuccBlUpd, Bal, PlayerServices.Credits));
+        player.PrintToCenter(string.Format(Config.SuccBlUpd, Bal, PlayerServices.Credits));
       }
       reader.Close();
       cmd.CommandText = $"DELETE FROM {Config.Db.Prefix}{Config.Db.TransactionTable}";
