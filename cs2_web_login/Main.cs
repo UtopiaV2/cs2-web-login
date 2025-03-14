@@ -196,6 +196,15 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     player.PrintToConsole(pwS);
     player.PrintToConsole("---------------------------------------------------------------");
   }
-  static void Main() { }
+
+  [ConsoleCommand("css_printconfig", "Print config")]
+  public void OnPrintConfigCmd(CCSPlayerController? player, CommandInfo info)
+  {
+    if (player != null)
+    {
+      return;
+    }
+    base.Logger.LogInformation(Config.ToString());
+  }
 }
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/
