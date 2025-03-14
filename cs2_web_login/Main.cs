@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using CounterStrikeSharp.API.Core.Capabilities;
 using CasesAPI;
 using BC = BCrypt.Net;
+using CounterStrikeSharp.API.Modules.Entities;
 
 namespace cs2_web_login;
 
@@ -21,10 +22,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
   public override string ModuleDescription => "Creates logins for cry babies! :D";
   public Cfg Config { get; set; } = new Cfg();
   AutoUpdater AU = null!; // AutoUpdater is not null, but it's not initialized
-  private CI2 CI = null!; // CaseIntegration is not null, but it's not initialized
   private PlayerCapability<IPlayerServices> Capability_PlayerServices { get; } = new("k4-cases:player-services");
-  private List<Payload> Payloads = new();
-
   private CounterStrikeSharp.API.Modules.Timers.Timer T = null!;
 
   public override void Load(bool hotReload)
@@ -49,47 +47,43 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    CI = new CI2(Config.PusherCfg, base.Logger, ref Payloads);
-    T = new(Config.PusherCfg.Interval, () =>
+    T = new(Config.Interval, () =>
     {
-      if (Payloads.Count == 0)
+      if (db == null)
       {
-        Logger.LogInformation("Payloads count is 0");
-        return;
+        throw new Exception("Db is null");
       }
-      Logger.LogInformation("Payloads count: " + Payloads.Count);
-      Payloads.ForEach((payload) =>
+      MySqlCommand cmd = db.GetConnection().CreateCommand();
+      cmd.CommandText = $"LOCK TABLE {Config.Db.TransactionTable} WRITE";
+      cmd.ExecuteNonQuery();
+      cmd.CommandText = $"SELECT t.id t.steam_id, t.amount FROM {Config.Db.Prefix}{Config.Db.TransactionTable} t";
+      MySqlDataReader reader = cmd.ExecuteReader();
+      while (reader.Read())
       {
-        CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
+        int TransactionID = reader.GetInt32(0);
+        ulong SteamID = reader.GetUInt64(1);
+        decimal Bal = reader.GetDecimal(2);
+        base.Logger.LogInformation($"TransactionID: {TransactionID}, SteamID: {SteamID}, Amount: {Bal}");
+        var player = Utilities.GetPlayerFromSteamId(SteamID);
         if (player == null)
         {
-          Logger.LogError("Player is null");
-          return;
+          base.Logger.LogWarning("Player is null no need for correction");
+          continue;
         }
         IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
         if (PlayerServices == null)
         {
-          Logger.LogError("PlayerServices is null");
-          return;
+          base.Logger.LogError("PlayerServices is null");
+          continue;
         }
-        PlayerServices.Credits = payload.Bal;
-        Payloads.Remove(payload);
-      });
-      // Payload payload = Payloads[0];
-      // CCSPlayerController? player = Utilities.GetPlayerFromSteamId(payload.SteamID);
-      // if (player == null)
-      // {
-      //   Logger.LogError("Player is null");
-      //   return;
-      // }
-      // IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-      // if (PlayerServices == null)
-      // {
-      //   Logger.LogError("PlayerServices is null");
-      //   return;
-      // }
-      // PlayerServices.Credits = payload.Bal;
-      // Payloads.RemoveAt(0);
+        PlayerServices.Credits += Bal;
+        player.PrintToCenterAlert(string.Format(Config.SuccBlUpd, Bal, PlayerServices.Credits));
+      }
+      reader.Close();
+      cmd.CommandText = $"DELETE FROM {Config.Db.Prefix}{Config.Db.TransactionTable}";
+      cmd.ExecuteNonQuery();
+      cmd.CommandText = $"UNLOCK TABLES";
+      cmd.ExecuteNonQuery();
     }, TimerFlags.REPEAT);
   }
 

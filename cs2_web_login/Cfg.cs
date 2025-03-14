@@ -8,8 +8,8 @@ public class Cfg : BasePluginConfig
   [JsonPropertyName("Database")]
   public DB Db { get; set; } = new DB();
 
-  [JsonPropertyName("Pusher")]
-  public PusherCfg PusherCfg { get; set; } = new PusherCfg();
+  [JsonPropertyName("Interval")]
+  public float Interval { get; set; } = 0.5f;
 
   [JsonPropertyName("AutoUpdate")]
   public bool AutoUpdate { get; set; } = true;
@@ -40,6 +40,9 @@ public class Cfg : BasePluginConfig
 
   [JsonPropertyName("SuccessfulDeleteion")]
   public string SuccDel { get; set; } = "The credentials has been deleted!";
+
+  [JsonPropertyName("SuccessfulBalUpdate")]
+  public string SuccBlUpd { get; set; } = "You have received {0} credits!\nNow you have: {1} credits!";
 }
 // "Jelszó, a /delcredentials ki lehet törölni, ill. a weboldalon betudod állítani a saját jelszavadat"
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/

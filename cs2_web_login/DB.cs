@@ -12,6 +12,8 @@ public class DB
 
   public string Table { get; set; } = "user";
 
+  public string TransactionTable { get; set; } = "website_transactions";
+
   public string Prefix { get; set; } = "";
 
 }
