@@ -88,6 +88,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
         cmd.ExecuteNonQuery();
       }, TimerFlags.REPEAT);
     });
+    thread.Start();
   }
 
   public void OnConfigParsed(Cfg config)
