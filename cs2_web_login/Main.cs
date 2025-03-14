@@ -56,7 +56,7 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
       MySqlCommand cmd = db.GetConnection().CreateCommand();
       cmd.CommandText = $"LOCK TABLE {Config.Db.TransactionTable} WRITE";
       cmd.ExecuteNonQuery();
-      cmd.CommandText = $"SELECT t.id t.steam_id, t.amount FROM {Config.Db.Prefix}{Config.Db.TransactionTable} t";
+      cmd.CommandText = $"SELECT t.id, t.steam_id, t.amount FROM {Config.Db.Prefix}{Config.Db.TransactionTable} t";
       MySqlDataReader reader = cmd.ExecuteReader();
       while (reader.Read())
       {
