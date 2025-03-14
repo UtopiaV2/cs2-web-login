@@ -47,48 +47,44 @@ public class Class1 : BasePlugin, IPluginConfig<Cfg>
     {
       base.Logger.LogInformation("No updates available");
     }
-    Thread thread = new(() =>
+    T = new(Config.Interval, () =>
     {
-      T = new(Config.Interval, () =>
+      if (db == null)
       {
-        if (db == null)
+        throw new Exception("Db is null");
+      }
+      MySqlCommand cmd = db.GetConnection().CreateCommand();
+      cmd.CommandText = $"LOCK TABLE {Config.Db.TransactionTable} WRITE";
+      cmd.ExecuteNonQuery();
+      cmd.CommandText = $"SELECT t.id, t.steam_id, t.amount FROM {Config.Db.Prefix}{Config.Db.TransactionTable} t";
+      MySqlDataReader reader = cmd.ExecuteReader();
+      while (reader.Read())
+      {
+        int TransactionID = reader.GetInt32(0);
+        ulong SteamID = reader.GetUInt64(1);
+        decimal Bal = reader.GetDecimal(2);
+        base.Logger.LogInformation($"TransactionID: {TransactionID}, SteamID: {SteamID}, Amount: {Bal}");
+        var player = Utilities.GetPlayerFromSteamId(SteamID);
+        if (player == null)
         {
-          throw new Exception("Db is null");
+          base.Logger.LogWarning("Player is null no need for correction");
+          continue;
         }
-        MySqlCommand cmd = db.GetConnection().CreateCommand();
-        cmd.CommandText = $"LOCK TABLE {Config.Db.TransactionTable} WRITE";
-        cmd.ExecuteNonQuery();
-        cmd.CommandText = $"SELECT t.id, t.steam_id, t.amount FROM {Config.Db.Prefix}{Config.Db.TransactionTable} t";
-        MySqlDataReader reader = cmd.ExecuteReader();
-        while (reader.Read())
+        IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
+        if (PlayerServices == null)
         {
-          int TransactionID = reader.GetInt32(0);
-          ulong SteamID = reader.GetUInt64(1);
-          decimal Bal = reader.GetDecimal(2);
-          base.Logger.LogInformation($"TransactionID: {TransactionID}, SteamID: {SteamID}, Amount: {Bal}");
-          var player = Utilities.GetPlayerFromSteamId(SteamID);
-          if (player == null)
-          {
-            base.Logger.LogWarning("Player is null no need for correction");
-            continue;
-          }
-          IPlayerServices? PlayerServices = Capability_PlayerServices.Get(player);
-          if (PlayerServices == null)
-          {
-            base.Logger.LogError("PlayerServices is null");
-            continue;
-          }
-          PlayerServices.Credits += Bal;
-          player.PrintToCenterAlert(string.Format(Config.SuccBlUpd, Bal, PlayerServices.Credits));
+          base.Logger.LogError("PlayerServices is null");
+          continue;
         }
-        reader.Close();
-        cmd.CommandText = $"DELETE FROM {Config.Db.Prefix}{Config.Db.TransactionTable}";
-        cmd.ExecuteNonQuery();
-        cmd.CommandText = $"UNLOCK TABLES";
-        cmd.ExecuteNonQuery();
-      }, TimerFlags.REPEAT);
-    });
-    thread.Start();
+        PlayerServices.Credits += Bal;
+        player.PrintToCenterAlert(string.Format(Config.SuccBlUpd, Bal, PlayerServices.Credits));
+      }
+      reader.Close();
+      cmd.CommandText = $"DELETE FROM {Config.Db.Prefix}{Config.Db.TransactionTable}";
+      cmd.ExecuteNonQuery();
+      cmd.CommandText = $"UNLOCK TABLES";
+      cmd.ExecuteNonQuery();
+    }, TimerFlags.REPEAT);
   }
 
   public void OnConfigParsed(Cfg config)
