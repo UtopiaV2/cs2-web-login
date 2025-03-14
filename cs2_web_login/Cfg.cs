@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using CounterStrikeSharp.API.Core;
 
@@ -43,6 +44,11 @@ public class Cfg : BasePluginConfig
 
   [JsonPropertyName("SuccessfulBalUpdate")]
   public string SuccBlUpd { get; set; } = "You have received {0} credits!\nNow you have: {1} credits!";
+
+  public override string ToString()
+  {
+    return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+  }
 }
 // "Jelszó, a /delcredentials ki lehet törölni, ill. a weboldalon betudod állítani a saját jelszavadat"
 /*Vim: set expandtab tabstop=4 shiftwidth=4:*/
